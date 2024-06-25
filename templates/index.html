@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: linear-gradient(135deg, #2c2c2c, #1c1c1c);
+            color: #ffffff;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 20px auto;
+            background: #333333;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid #444444;
+            background-color: #4d4d4d;
+            border-radius: 4px;
+            padding: 15px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        h1 {
+            color: #f8f9fa;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-top: 10px;
+            font-size: 16px;
+            background-color: #4d4d4d;
+            color: #ffffff;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: linear-gradient(90deg, #ff9900 0%, #ff6600 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #cc5200 0%, #994400 100%);
+        }
+
+        .result {
+            margin-top: 30px;
+            border-radius: 4px;
+            overflow-y: auto;
+            border: 1px solid #444444;
+            background-color: #4d4d4d;
+            height: 50%;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        table, th, td {
+            border: 1px solid #555555;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #666666;
+            color: #ffffff;
+        }
+
+        td {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h2>Analizador</h2>
+            <form method="POST" class="mb-6">
+                <textarea name="code" rows="10">{{ request.form.code if request.method == 'POST' else '' }}</textarea>
+                <center><input type="submit" value="Analizar"></center>
+            </form>
+        </div>
+        <div class="right-section">
+            <div>
+                <h2>Análisis Léxico</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Palabra reservada</th>
+                            <th>Identificador</th>
+                            <th>Número</th>
+                            <th>Símbolo</th>
+                            <th>Paréntesis izquierdo</th>
+                            <th>Paréntesis Derecho</th>
+                            <th>Llave izquierda</th>
+                            <th>Llave Derecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for token in tokens %}
+                        <tr>
+                            <td>{{ token.value }}</td>
+                            <td>{{ 'X' if token.type in ['INT', 'RETURN'] else '' }}</td>
+                            <td>{{ 'X' if token.type == 'ID' else '' }}</td>
+                            <td>{{ 'X' if token.type == 'NUMBER' else '' }}</td>
+                            <td>{{ 'X' if token.type in ['PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'ASSIGN', 'LT', 'LE', 'GT', 'GE', 'EQ', 'NE', 'DOT', 'SEMICOLON', 'COMMA', 'SINGLE_QUOTE'] else '' }}</td>
+                            <td>{{ 'X' if token.type == 'LPAREN' else '' }}</td>
+                            <td>{{ 'X' if token.type == 'RPAREN' else '' }}</td>
+                            <td>{{ 'X' if token.type == 'LBRACE' else '' }}</td>
+                            <td>{{ 'X' if token.type == 'RBRACE' else '' }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>TOTAL</td>
+                            <td>{{ counts.reserved }}</td>
+                            <td>{{ counts.id }}</td>
+                            <td>{{ counts.number }}</td>
+                            <td>{{ counts.symbol }}</td>
+                            <td>{{ counts.lparen }}</td>
+                            <td>{{ counts.rparen }}</td>
+                            <td>{{ counts.lbrace }}</td>
+                            <td>{{ counts.rbrace }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="AS">
+                <div>
+                    <h2>Análisis Sintáctico</h2>
+                    <pre>{{ syntax_result }}</pre>
+                </div>
+                <div>
+                    <h2>Análisis Semántico</h2>
+                    <p>{{ semantic_result }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
